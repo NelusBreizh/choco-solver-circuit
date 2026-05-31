@@ -1471,7 +1471,7 @@ public interface IIntConstraintFactory extends ISelf<Model> {
      * @return a circuit constraint
      */
     default Constraint circuit(IntVar[] vars, int offset) {
-        return circuit(vars, offset, CircuitConf.RD);
+        return circuit(vars, offset, CircuitConf.NEW);
     }
 
     /**
@@ -1503,6 +1503,17 @@ public interface IIntConstraintFactory extends ISelf<Model> {
         Propagator<?>[] props;
         if (conf == CircuitConf.LIGHT) {
             props = new Propagator[]{new PropNoSubtour(vars, offset)};
+        } else if (conf == CircuitConf.NEW) {
+            IntVar[] pred = vars[0].getModel().intVarArray("p", vars.length, 0, vars.length - 1);
+            props = new Propagator[]{
+                    new New_PropCircuit_ReverseGraph(vars, offset, pred, 0),
+                    new New_PropCircuit_Assignment(vars, offset, pred, 0),
+                    new New_PropCircuit_NoSubtour_CompressedPaths(vars, offset),
+//                    new New_PropCircuit_ConnectivityCheck(vars, offset, pred, 0),
+//                    new New_PropCircuit_ReducedPath(vars, offset, pred, 0),
+//                    new PropCircuit_ArboFiltering(vars, offset, CircuitConf.FIRST),
+//                    new PropCircuit_AntiArboFiltering(vars, offset, CircuitConf.FIRST)
+            };
         } else {
             props = new Propagator[]{
                     new PropNoSubtour(vars, offset),

@@ -14,6 +14,7 @@
 package org.chocosolver.solver.constraints.nary;
 
 import org.chocosolver.solver.Model;
+import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.IntVar;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -40,6 +41,9 @@ public class CircuitTest {
         Model model = new Model();
         IntVar[] x = model.intVarArray("x", 10, 0, 10, false);
         model.circuit(x).post();
+        model.getSolver().showDecisions();
+        model.getSolver().showSolutions();
+        model.getSolver().setSearch(Search.inputOrderLBSearch());
         model.getSolver().solve();
         assertEquals(1, model.getSolver().getSolutionCount());
     }
@@ -51,8 +55,39 @@ public class CircuitTest {
         IntVar[] y = model.intVarArray("y", 5, 5, 9, true);
         IntVar[] vars = append(x, y);
         model.circuit(vars).post();
+        model.getSolver().showDecisions();
+        model.getSolver().showSolutions();
+        model.getSolver().showStatistics();
         model.getSolver().solve();
         assertEquals(0, model.getSolver().getSolutionCount());
+    }
+
+    @Test(groups = "1s", timeOut = 60000)
+    public static void test3bis() {
+        Model model = new Model();
+        IntVar[] x = model.intVarArray("x", 5, 0, 5, false);
+        IntVar[] y = model.intVarArray("y", 5, 5, 9, false);
+        IntVar[] vars = append(x, y);
+        model.circuit(vars).post();
+        model.getSolver().showDecisions();
+        model.getSolver().showSolutions();
+        model.getSolver().showStatistics();
+        model.getSolver().solve();
+        assertEquals(0, model.getSolver().getSolutionCount());
+    }
+
+    @Test(groups = "1s", timeOut = 60000)
+    public static void test3ter() {
+        Model model = new Model();
+        IntVar[] x = model.intVarArray("x", 5, 0, 5, false);
+        IntVar[] y = model.intVarArray("y", 5, 4, 9, false);
+        IntVar[] vars = append(x, y);
+        model.circuit(vars).post();
+        model.getSolver().showDecisions();
+        model.getSolver().showSolutions();
+        model.getSolver().showStatistics();
+        model.getSolver().solve();
+        assertEquals(1, model.getSolver().getSolutionCount());
     }
 
     @Test(groups = "1s", timeOut = 60000)
