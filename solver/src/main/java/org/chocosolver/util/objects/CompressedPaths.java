@@ -37,6 +37,10 @@ public class CompressedPaths {
 
     public int getTail(int i) {return tail[i];}
 
+    public boolean isHead(int i) {return head[i] == i;}
+
+    public boolean isTail(int i) {return tail[i] == i;}
+
 
     /**
      * Merge two paths from extremities i and j:
@@ -46,17 +50,24 @@ public class CompressedPaths {
      * @Warning This method can be called only if (i,j) is not already part of a compressed path.
      */
     public void mergePaths(int i, int j, IEnvironment env) {
+        assert isTail(i) && isHead(j) && getTail(j) != i && getHead(i) != j;
         if (numberPaths > 1) {
             int head_i = head[i];
             int tail_j = tail[j];
+            // Update information for the new extremities
             tail[head_i] = tail_j;
             head[tail_j] = head_i;
+            // Required for the isHead and isTail queries
+            tail[i] = tail_j;
+            head[j] = head_i;
             numberPaths--;
 
-            // Here we store the operations to call during the backtrack
+            // Here we store the operations to call during backtrack
             env.save(() -> {
                 tail[head_i] = i;
                 head[tail_j] = j;
+                tail[i] = i;
+                head[j] = j;
                 numberPaths++;
             });
         }

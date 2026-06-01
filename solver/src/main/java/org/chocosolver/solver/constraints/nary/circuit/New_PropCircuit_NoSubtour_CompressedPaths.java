@@ -40,16 +40,25 @@ public class New_PropCircuit_NoSubtour_CompressedPaths extends Propagator<IntVar
         this.compressedPaths = new CompressedPaths(n);
     }
 
-    public void procedureInstantiation(int i, int j) throws ContradictionException {
+    public int procedureInstantiation(int i, int j) throws ContradictionException {
+        // Subtour detection
+        if (!compressedPaths.isTail(i) || !compressedPaths.isHead(j) || compressedPaths.getTail(j) == i) {fails();}
         IEnvironment env = model.getEnvironment();
+//        System.out.printf("NoSubtour react on instantiation (%d, %d) \n", i, j);
         compressedPaths.mergePaths(i,j, env);
         // Eliminate the sub-tour arc or enforce it if all vertices are on the same path
         if (compressedPaths.getNumberPaths() > 1) {
+//            System.out.printf("NoSubtour filter (%d, %d) \n", compressedPaths.getTail(j), compressedPaths.getHead(i));
             succ[compressedPaths.getTail(j)].removeValue(compressedPaths.getHead(i) + offsetSucc, this);
+            // If the new tail is now instantiated we self propagate
+            if (succ[compressedPaths.getTail(j)].isInstantiated()) {return compressedPaths.getTail(j);}
         } else {
+//            System.out.printf("NoSubtour enforce (%d, %d) \n", compressedPaths.getTail(j), compressedPaths.getHead(i));
             succ[compressedPaths.getTail(j)].instantiateTo(compressedPaths.getHead(i) + offsetSucc, this);
         }
+        return -1;
     }
+
 
     @Override
     public void propagate(int evtmask) throws ContradictionException {
@@ -62,7 +71,7 @@ public class New_PropCircuit_NoSubtour_CompressedPaths extends Propagator<IntVar
             }
             for (int i = 0; i < n; i++) {
                 if (succ[i].isInstantiated()) {
-                    procedureInstantiation(i, succ[i].getValue() - offsetSucc);
+                    selfPropagate(i);
                 }
             }
         }
@@ -70,7 +79,19 @@ public class New_PropCircuit_NoSubtour_CompressedPaths extends Propagator<IntVar
 
     @Override
     public void propagate(int idxVarInProp, int mask) throws ContradictionException {
-        procedureInstantiation(idxVarInProp, succ[idxVarInProp].getValue() - offsetSucc);
+        if (compressedPaths.isTail(idxVarInProp)) { // If not, this instantiation has already been processed by self propagation
+            selfPropagate(idxVarInProp);
+        }
+    }
+
+    public void selfPropagate(int idxVarInProp) throws ContradictionException {
+        if (compressedPaths.getNumberPaths() == 1) {return;} // The cycle has been completed by this propagator OR this instantiation has already been processed internally by self propagation
+        int index = idxVarInProp;
+        assert succ[index].isInstantiated();
+        // Removing the subtour arc may instantiate the tail of the newly formed path, so we may need to self propagate
+        while (index != -1) {
+            index = procedureInstantiation(index, succ[index].getValue() - offsetSucc);
+        }
     }
 
     @Override
@@ -80,11 +101,11 @@ public class New_PropCircuit_NoSubtour_CompressedPaths extends Propagator<IntVar
 
     @Override
     public ESat isEntailed() {
-        if (compressedPaths.getNumberPaths() > 1) {
-            return ESat.UNDEFINED;
+        for (int i = 0; i < n; i++) {
+            if (!succ[i].isInstantiated()) {
+                return ESat.UNDEFINED;
+            }
         }
-        else {
-            return ESat.TRUE;
-        }
+        return compressedPaths.getNumberPaths() == 1 ? ESat.TRUE : ESat.FALSE;
     }
 }

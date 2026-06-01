@@ -55,9 +55,11 @@ public class New_PropCircuit_ReverseGraph extends Propagator<IntVar> {
             idmPred[i] = pred[i].monitorDelta(this);
         }
         this.procSucc = val -> {
+//            System.out.printf("remove %d <-- %d \n", val - offsetSucc, varIdx + offsetPred);
             pred[val - offsetSucc].removeValue(varIdx + offsetPred, this);
         };
         this.procPred = val -> {
+//            System.out.printf("remove %d --> %d \n", val - offsetPred, varIdx + offsetSucc);
             succ[val - offsetPred].removeValue(varIdx + offsetSucc, this);
         };
     }
@@ -104,9 +106,11 @@ public class New_PropCircuit_ReverseGraph extends Propagator<IntVar> {
     public void propagate(int idxVarInProp, int mask) throws ContradictionException {
         if (idxVarInProp < n) {
             varIdx = idxVarInProp;
+//            System.out.printf("ReverseGraph react on successor modification of %d \n", idxVarInProp);
             idmSucc[varIdx].forEachRemVal(procSucc);
         } else {
             varIdx = idxVarInProp - n;
+//            System.out.printf("ReverseGraph react on predecessor modification of %d \n", idxVarInProp - n);
             idmPred[varIdx].forEachRemVal(procPred);
         }
     }

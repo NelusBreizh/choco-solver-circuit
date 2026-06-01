@@ -1509,8 +1509,8 @@ public interface IIntConstraintFactory extends ISelf<Model> {
                     new New_PropCircuit_ReverseGraph(vars, offset, pred, 0),
                     new New_PropCircuit_Assignment(vars, offset, pred, 0),
                     new New_PropCircuit_NoSubtour_CompressedPaths(vars, offset),
-//                    new New_PropCircuit_ConnectivityCheck(vars, offset, pred, 0),
-//                    new New_PropCircuit_ReducedPath(vars, offset, pred, 0),
+                    new New_PropCircuit_ConnectivityCheck(vars, offset, pred, 0),
+                    new New_PropCircuit_ReducedPath(vars, offset, pred, 0),
 //                    new PropCircuit_ArboFiltering(vars, offset, CircuitConf.FIRST),
 //                    new PropCircuit_AntiArboFiltering(vars, offset, CircuitConf.FIRST)
             };

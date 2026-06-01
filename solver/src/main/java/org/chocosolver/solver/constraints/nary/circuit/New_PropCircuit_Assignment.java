@@ -65,9 +65,14 @@ public class New_PropCircuit_Assignment extends Propagator<IntVar> {
 
     @Override
     public void propagate(int idxVarInProp, int mask) throws ContradictionException {
+        assert vars[idxVarInProp].isInstantiated();
         if (idxVarInProp < n) {
+//            System.out.printf("Assignment reacts on successor instantiation %d --> %d \n", idxVarInProp, succ[idxVarInProp].getValue() - offsetSucc);
+//            System.out.printf("enforces %d <-- %d \n", succ[idxVarInProp].getValue() - offsetSucc, idxVarInProp + offsetPred);
             pred[succ[idxVarInProp].getValue() - offsetSucc].instantiateTo(idxVarInProp + offsetPred, this);
         } else {
+//            System.out.printf("Assignment reacts on predecessor instantiation %d <-- %d \n", idxVarInProp - n, pred[idxVarInProp - n].getValue());
+//            System.out.printf("enforces %d --> %d \n", pred[idxVarInProp - n].getValue(), idxVarInProp - n);
             succ[pred[idxVarInProp - n].getValue() - offsetPred].instantiateTo(idxVarInProp - n + offsetSucc, this);
         }
     }
