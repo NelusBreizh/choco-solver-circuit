@@ -41,9 +41,6 @@ public class CircuitTest {
         Model model = new Model();
         IntVar[] x = model.intVarArray("x", 10, 0, 10, false);
         model.circuit(x).post();
-        model.getSolver().showDecisions();
-        model.getSolver().showSolutions();
-        model.getSolver().setSearch(Search.inputOrderLBSearch());
         model.getSolver().solve();
         assertEquals(1, model.getSolver().getSolutionCount());
     }
@@ -58,6 +55,7 @@ public class CircuitTest {
         model.getSolver().showDecisions();
         model.getSolver().showSolutions();
         model.getSolver().showStatistics();
+//        model.getSolver().setSearch(Search.inputOrderLBSearch(append(x, y)));
         model.getSolver().solve();
         assertEquals(0, model.getSolver().getSolutionCount());
     }
@@ -66,11 +64,10 @@ public class CircuitTest {
     public static void test3bis() {
         Model model = new Model();
         IntVar[] x = model.intVarArray("x", 5, 0, 5, false);
-        IntVar[] y = model.intVarArray("y", 5, 5, 9, false);
-        IntVar[] vars = append(x, y);
+        IntVar[] y = model.intVarArray("y", 1, 0, 10, false);
+        IntVar[] z = model.intVarArray("z", 5, 5, 10, false);
+        IntVar[] vars = append(x, y, z);
         model.circuit(vars).post();
-        model.getSolver().showDecisions();
-        model.getSolver().showSolutions();
         model.getSolver().showStatistics();
         model.getSolver().solve();
         assertEquals(0, model.getSolver().getSolutionCount());
@@ -79,9 +76,10 @@ public class CircuitTest {
     @Test(groups = "1s", timeOut = 60000)
     public static void test3ter() {
         Model model = new Model();
-        IntVar[] x = model.intVarArray("x", 5, 0, 5, false);
-        IntVar[] y = model.intVarArray("y", 5, 4, 9, false);
-        IntVar[] vars = append(x, y);
+        IntVar[] x = model.intVarArray("x", 5, 0, 6, false);
+        IntVar[] y = model.intVarArray("y", 2, 0, 11, false);
+        IntVar[] z = model.intVarArray("z", 5, 5, 11, false);
+        IntVar[] vars = append(x, y, z);
         model.circuit(vars).post();
         model.getSolver().showDecisions();
         model.getSolver().showSolutions();

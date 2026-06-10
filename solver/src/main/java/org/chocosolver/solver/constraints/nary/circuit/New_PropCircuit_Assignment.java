@@ -87,10 +87,7 @@ public class New_PropCircuit_Assignment extends Propagator<IntVar> {
         for (int i = 0; i < n; i++) {
             if (!succ[i].isInstantiated() || !pred[i].isInstantiated()) {
                 return ESat.UNDEFINED;
-            }
-        }
-        for (int i = 0; i < n; i++) {
-            if (pred[succ[i].getValue() - offsetSucc].getValue() - offsetPred != i) {
+            } else if (pred[succ[i].getValue() - offsetSucc].getValue() - offsetPred != i) {
                 return ESat.FALSE;
             }
         }
